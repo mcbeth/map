@@ -56,6 +56,12 @@ function log(o) {
     console.log(o);
 }
 
+function copyTemplateElem(sourceClass) {
+    var elem = document.querySelector(`#templates .${sourceClass}`).cloneNode(true);
+    elem.toggleClass('template-cloned', true);
+    return elem;
+}
+
 function polylineCenterLngLat(coords) {
     var minLon = 180;
     var maxLon = -180;
@@ -354,6 +360,21 @@ var MapboxApp = class MapboxApp {
 //            log("load event");
             setTimeout(function () { this.styleLoaded(); }.bind(this), 1500);
         }.bind(this));
+
+        document.querySelectorAll('a.permalink').forEach(function(elem) {
+            elem.addEventListener('click', function (e) {
+                this.permalinkSelected();
+                e.preventDefault();
+            }.bind(this));
+        }.bind(this));
+
+        document.body.addEventListener("keyup", function (e) {
+            if (e.keyCode == 27) { // ESC
+                document.querySelectorAll(".dialog-container.template-cloned").forEach(function (elem) {
+                    elem.remove();
+                });
+            }
+        });
     }
 
     styleLoaded() {
@@ -385,7 +406,10 @@ var MapboxApp = class MapboxApp {
     mapTouched(e) {
 //        log(`mapTouched at ${e.lngLat}`);
         var found = this.finder.bestFeatureAtCoordinate(e.point);
-        if (!found) { return; }
+        if (!found) {
+            // this.showSelection(null, { updateBounds: false, animated: false });
+            return;
+        }
         var sel = MapSelection.fromFeature(found);
         if (sel) {
             this.showSelection(sel, { updateBounds: true, animated: true });
@@ -445,8 +469,13 @@ var MapboxApp = class MapboxApp {
 
     replaceHistoryState(sel) {
         var historyTitle = "#TrailsRoc Maps";
+        var itemElem = document.querySelector('#selected-item');
         if (sel.title) {
             historyTitle = `${sel.title} — #TrailsRoc Maps`;
+            itemElem.innerText = sel.title;
+            itemElem.toggleClass('expanded', true);
+        } else {
+            itemElem.toggleClass('expanded', false);
         }
         document.title = historyTitle;
         history.replaceState(sel.historyStateObj, historyTitle, sel.canonicalUrl);
@@ -461,6 +490,27 @@ var MapboxApp = class MapboxApp {
         if (metaElem) {
             metaElem.content = metaContent;
         }
+
+        document.querySelectorAll('a.permalink').forEach(function (elem) {
+            elem.href = sel.canonicalUrl;
+        });
+    }
+
+    permalinkSelected() {
+        if (!this.selection) { return; }
+        if (!this.selection.canonicalUrl) { return; }
+        var containerElem = copyTemplateElem('dialog-container');
+        var contentElem = copyTemplateElem('permalink-dialog');
+        var inputElem = contentElem.querySelector('input');
+        inputElem.value = this.selection.canonicalUrl.toString();
+        containerElem.append(contentElem);
+        document.body.append(containerElem);
+        window.setTimeout(function() {
+            inputElem.focus();
+            inputElem.select();
+        }, 250);
+        // TODO click event on any dialog-container: deletes the elem
+        // TODO escape key: find all dialog-containers and delete them
     }
 };
 

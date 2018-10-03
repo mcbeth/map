@@ -9,48 +9,35 @@
 <link rel="apple-touch-icon" href="/assets/favicon.png">
 <meta name="apple-itunes-app" content="app-id=906444281">
 
+<link rel="stylesheet" href="/assets/map-app.css">
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.css' rel='stylesheet' />
 <script defer src="/assets/map-app.js"></script>
 
-<style>
-body {
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#trailsroc-map {
-    position: absolute;
-    top: 0;
-    right: 0; /* 25%; */
-    bottom: 0;
-    left: 0;
-    display: block;
-/*    height: 100%;
-    width: 75%; */
-}
-
-/* right-align for wide screens, bottom-align for narrow. small by default */
-#trailsroc-map-panel {
-    display: none;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 75%;
-    height: 100%;
-}
-
-#trailsroc-map-panel.expanded {
-    display: block;
-}
-
-</style>
 
 </head>
 
-<body onload="initializePage();"><section id="trailsroc-map"></section></body>
+<body onload="initializePage();">
+<div id="container">
+    <header>
+        <h1><a class="permalink" href="https://map.trailsroc.org/" title="Copy this link to share the current map location">#TrailsRoc Maps<span id="selected-item"></span></a></h1>
+        <nav>
+            <a href="https://trailsroc.org/">Homepage</a>
+            <a href="https://trailsroc.org/trailsroc-the-app/">#TrailsRoc mobile apps</a>
+            <a href="https://map.trailsroc.org/" class="permalink" title="Copy this link to share the current map location">Share this map</a>
+            <a href="#" style="display: none;">Get driving directions</a>
+        </nav>
+    </header>
+    <section id="trailsroc-map"></section>
+</div>
+<div id="templates">
+    <div class="dialog-container" onclick="if (event.target == this) { this.remove(); }"></div>
+    <div class="permalink-dialog">
+        <h3>Share This Map</h3>
+        <p>Copy the link below to share this via messaging or social media. You can also send this web page using your browser’s share buttons — it will always be a direct link to what you’re currently viewing.</p>
+        <input type="text" readonly>
+    </div>
+</div>
+</body>
 
 </html>
