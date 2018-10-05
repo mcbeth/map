@@ -204,6 +204,23 @@ var MapSelection = class MapSelection {
         return url;
     }
 
+    get systemMapURL() {
+        if (!this.lat || !this.lon) {
+            return null;
+        }
+        var url = new URL('https://maps.apple.com');
+        var coordString = `${this.lat},${this.lon}`;
+        url.searchParams.set('ll', coordString);
+        url.searchParams.set('daddr', coordString);
+        if (!!this.zoom) {
+            url.searchParams.set('z', this.zoom);
+        }
+        if (!!this.title) {
+            url.searchParams.set('q', this.title);
+        }
+        return url;
+    }
+
     get historyStateObj() {
         var values = { };
         if (!!this.lat) { values.lat = this.lat };
@@ -494,6 +511,13 @@ var MapboxApp = class MapboxApp {
         document.querySelectorAll('a.permalink').forEach(function (elem) {
             elem.href = sel.canonicalUrl;
         });
+
+        var systemMapURL = sel.systemMapURL;
+        if (systemMapURL) {
+            document.querySelectorAll('a.get-directions').forEach(function (elem) {
+                elem.href = systemMapURL.toString();
+            });
+        }
     }
 
     permalinkSelected() {
@@ -509,8 +533,6 @@ var MapboxApp = class MapboxApp {
             inputElem.focus();
             inputElem.select();
         }, 250);
-        // TODO click event on any dialog-container: deletes the elem
-        // TODO escape key: find all dialog-containers and delete them
     }
 };
 
