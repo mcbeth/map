@@ -36,7 +36,7 @@ Element.prototype.toggleClass = function(name, flag) {
 
 var trailsroc = (function() {
 
-var dev = (window.location.hostname != 'localhost');
+var dev = (window.location.hostname == 'localhost');
 var mapboxConfig = { };
 var canonicalUrlBase = "";
 
