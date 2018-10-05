@@ -38,13 +38,7 @@ var trailsroc = (function() {
 
 var dev = (window.location.hostname == 'localhost');
 var mapboxConfig = { };
-var canonicalUrlBase = "";
-
-if (window.location.hostname == 'localhost') {
-    canonicalUrlBase = "http://localhost:4000/";
-} else {
-    canonicalUrlBase = "https://map.trailsroc.org/";
-}
+var canonicalUrlBase = `${window.location.protocol}//${window.location.host}/`;
 
 if (dev) {
     mapboxConfig.token = 'pk.eyJ1IjoibW1lcnRzb2NrIiwiYSI6ImNqM2xsdmM2azAwenYzM3J6bmx4amdkenUifQ.I7qKxvIRIYu22LK9mKv2xg';
@@ -212,6 +206,8 @@ var MapSelection = class MapSelection {
         if (!this.lat || !this.lon) {
             return null;
         }
+
+        // https://developer.apple.com/library/archive/featuredarticles/iPhoneURLScheme_Reference/MapLinks/MapLinks.html
         var url = new URL('https://maps.apple.com');
         var coordString = `${this.lat},${this.lon}`;
         url.searchParams.set('ll', coordString);
