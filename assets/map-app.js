@@ -36,20 +36,24 @@ Element.prototype.toggleClass = function(name, flag) {
 
 var trailsroc = (function() {
 
-var dev = true;
+var dev = (window.location.hostname != 'localhost');
 var mapboxConfig = { };
 var canonicalUrlBase = "";
 
-if (dev) {
+if (window.location.hostname == 'localhost') {
     canonicalUrlBase = "http://localhost:4000/";
+} else {
+    canonicalUrlBase = "https://map.trailsroc.org/";
+}
+
+if (dev) {
     mapboxConfig.token = 'pk.eyJ1IjoibW1lcnRzb2NrIiwiYSI6ImNqM2xsdmM2azAwenYzM3J6bmx4amdkenUifQ.I7qKxvIRIYu22LK9mKv2xg';
     mapboxConfig.styleUriTemplate = 'https://api.mapbox.com/styles/v1/mmertsock/cj4693efo04te2rp5tdx3nyub/tiles/256/{z}/{x}/{y}?access_token={accessToken}';
     mapboxConfig.styleUri = 'mapbox://styles/mmertsock/cj4693efo04te2rp5tdx3nyub';
     mapboxConfig.tilesetID = 'mmertsock.cj9n3fgtp4y9w33s4gu6s8ir5-5yrj4';
 } else {
-    canonicalUrlBase = "https://map.trailsroc.org/";
     mapboxConfig.token = 'pk.eyJ1IjoidHJhaWxzcm9jIiwiYSI6ImNqOW94MjB2dTVraDYycW5yZmtxZ3ljNTUifQ.-servtc1C9TmiyDbmPCx_g';
-    mapboxConfig.styleUriTemplate = 'https://api.mapbox.com/styles/v1/trailsroc/cjby9cvr4dt3w2sqegwrb5nkl/tiles/256/{z}/{x}/{y}?access_token={accessToken}';
+    mapboxConfig.styleUri = 'mapbox://styles/trailsroc/cje2xhtz5d2fa2rq9bvnuhmgq';
 }
 
 function log(o) {
