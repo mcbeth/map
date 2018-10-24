@@ -1,13 +1,5 @@
 'use-strict';
 
-/*
-General feature todo list:
-https://trello.com/c/re1eBZps
-
-- /m/ shortlink support. note it will need to map /m/ url 
-  to the same root index.html on the server
-*/
-
 Element.prototype.toggleClass = function(name, flag) {
     if (flag && !this.classList.contains(name)) {
         this.classList.add(name);
@@ -27,9 +19,23 @@ var canonicalUrlBase = `${window.location.protocol}//${window.location.host}/`;
 if (dev) {
     mapboxConfig.token = 'pk.eyJ1IjoibW1lcnRzb2NrIiwiYSI6ImNqM2xsdmM2azAwenYzM3J6bmx4amdkenUifQ.I7qKxvIRIYu22LK9mKv2xg';
     mapboxConfig.styleUri = 'mapbox://styles/mmertsock/cj4693efo04te2rp5tdx3nyub';
+    mapboxConfig.defaultSelectionParams = {
+        lat: 43.025,
+        lon: -77.572,
+        zoom: 14.88,
+        itemID: null,
+        title: null
+    };
 } else {
     mapboxConfig.token = 'pk.eyJ1IjoidHJhaWxzcm9jIiwiYSI6ImNqOW94MjB2dTVraDYycW5yZmtxZ3ljNTUifQ.-servtc1C9TmiyDbmPCx_g';
     mapboxConfig.styleUri = 'mapbox://styles/trailsroc/cje2xhtz5d2fa2rq9bvnuhmgq';
+    mapboxConfig.defaultSelectionParams = {
+        lat: 43.16115,
+        lon: -77.63425,
+        zoom: 9,
+        itemID: null,
+        title: null
+    };
 }
 
 function log(o) {
@@ -75,14 +81,7 @@ function featureCenterLngLat(feature) {
 
 var MapSelection = class MapSelection {
     static defaultMapLocation() {
-        // TODO correct defaults
-        return new MapSelection({
-            lat: 43.025,
-            lon: -77.572,
-            zoom: 14.88,
-            itemID: null,
-            title: null,
-        });
+        return new MapSelection(mapboxConfig.defaultSelectionParams);
     }
 
     static fromURL(urlString) {
@@ -335,6 +334,7 @@ var MapboxApp = class MapboxApp {
             zoom: loc.webAppZoom
         });
 
+        this.map.addControl(new mapboxgl.NavigationControl({ showCompass: true, showZoom: true }));
         this.map.addControl(new mapboxgl.ScaleControl());
         this.map.addControl(new mapboxgl.GeolocateControl({ showUserLocation: true }));
 
