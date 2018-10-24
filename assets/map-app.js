@@ -144,6 +144,15 @@ var MapSelection = class MapSelection {
         return new MapSelection(values);
     }
 
+    static forVisibleMap(map) {
+        var values = {
+            lat: map.getCenter().lat,
+            lon: map.getCenter().lng,
+            zoom: map.getZoom()
+        };
+        return new MapSelection(values);
+    }
+
     constructor(values) {
         this.lat = values.lat;
         this.lon = values.lon;
@@ -406,7 +415,7 @@ var MapboxApp = class MapboxApp {
 //        log(`mapTouched at ${e.lngLat}`);
         var found = this.finder.bestFeatureAtCoordinate(e.point);
         if (!found) {
-            //this.showSelection(null, { updateBounds: false, animated: false });
+            this.showSelection(null, { updateBounds: false, animated: false });
             return;
         }
         var sel = MapSelection.fromFeature(found);
@@ -436,6 +445,9 @@ var MapboxApp = class MapboxApp {
             this.marker = null;
         }
         if (!sel) {
+            sel = MapSelection.forVisibleMap(this.map);
+        }
+        if (!sel) {
             this.selection = null;
             return;
         }
@@ -446,15 +458,17 @@ var MapboxApp = class MapboxApp {
         this.selection = sel;
         this.replaceHistoryState(sel);
 
-        this.marker = new mapboxgl.Marker()
-            .setLngLat([sel.coords.lon, sel.coords.lat])
-            .addTo(this.map);
-
-        if (sel.title && sel.title.length > 0) {
-            var popup = new mapboxgl.Popup()
-                .setText(sel.title);
-            this.marker.setPopup(popup);
+        if (sel.itemID) {
+            this.marker = new mapboxgl.Marker()
+                .setLngLat([sel.coords.lon, sel.coords.lat])
+                .addTo(this.map);
         }
+
+        // if (sel.title && sel.title.length > 0) {
+        //     var popup = new mapboxgl.Popup()
+        //         .setText(sel.title);
+        //     this.marker.setPopup(popup);
+        // }
 
         var cam = sel.camera;
         if (options.updateBounds && cam) {
@@ -503,12 +517,13 @@ var MapboxApp = class MapboxApp {
     }
 
     permalinkSelected() {
-        if (!this.selection) { return; }
-        if (!this.selection.canonicalUrl) { return; }
+        var sel = this.selection || MapSelection.forVisibleMap(this.map);
+        if (!sel) { return; }
+        if (!sel.canonicalUrl) { return; }
         var containerElem = copyTemplateElem('dialog-container');
         var contentElem = copyTemplateElem('permalink-dialog');
         var inputElem = contentElem.querySelector('input');
-        inputElem.value = this.selection.canonicalUrl.toString();
+        inputElem.value = sel.canonicalUrl.toString();
         containerElem.append(contentElem);
         document.body.append(containerElem);
 
