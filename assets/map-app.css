@@ -113,6 +113,12 @@ h1 a, h1 a:link, h1 a:visited, h1 a:active, h1 a:hover {
     background-color: hsla(0, 0%, 0%, 0.5);
 }
 
+.dialog-done {
+    margin: 0.5em 0 0 0;
+    padding: 0;
+    text-align: right;
+}
+
 .permalink-dialog {
     width: 300pt;
     max-width: 90%;

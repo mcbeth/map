@@ -4,24 +4,8 @@
 General feature todo list:
 https://trello.com/c/re1eBZps
 
-> map info panel html/css
-> tap on map and show selection info
-> parse selected entity from url and show info in selection panel
-> modify browser url when interacting with map
-- make sure min/max zoom, allowed map bounds, and default coords are correct
-- share button to share a permalink
-- meta tags, favicon, etc.
-- apple smart app banner, with deep-linking
-- android app banner
-- browser compatibility check
-- responsive design
-> customize map controls. always show ruler. play with default mouse/touch controls
-- satellite view support? maybe.
-- link back to trailsroc.org
-- "get driving directions" button
 - /m/ shortlink support. note it will need to map /m/ url 
   to the same root index.html on the server
-- change to trailsroc mapbox token when publishing
 */
 
 Element.prototype.toggleClass = function(name, flag) {
@@ -42,9 +26,7 @@ var canonicalUrlBase = `${window.location.protocol}//${window.location.host}/`;
 
 if (dev) {
     mapboxConfig.token = 'pk.eyJ1IjoibW1lcnRzb2NrIiwiYSI6ImNqM2xsdmM2azAwenYzM3J6bmx4amdkenUifQ.I7qKxvIRIYu22LK9mKv2xg';
-    mapboxConfig.styleUriTemplate = 'https://api.mapbox.com/styles/v1/mmertsock/cj4693efo04te2rp5tdx3nyub/tiles/256/{z}/{x}/{y}?access_token={accessToken}';
     mapboxConfig.styleUri = 'mapbox://styles/mmertsock/cj4693efo04te2rp5tdx3nyub';
-    mapboxConfig.tilesetID = 'mmertsock.cj9n3fgtp4y9w33s4gu6s8ir5-5yrj4';
 } else {
     mapboxConfig.token = 'pk.eyJ1IjoidHJhaWxzcm9jIiwiYSI6ImNqOW94MjB2dTVraDYycW5yZmtxZ3ljNTUifQ.-servtc1C9TmiyDbmPCx_g';
     mapboxConfig.styleUri = 'mapbox://styles/trailsroc/cje2xhtz5d2fa2rq9bvnuhmgq';
@@ -424,7 +406,7 @@ var MapboxApp = class MapboxApp {
 //        log(`mapTouched at ${e.lngLat}`);
         var found = this.finder.bestFeatureAtCoordinate(e.point);
         if (!found) {
-            // this.showSelection(null, { updateBounds: false, animated: false });
+            //this.showSelection(null, { updateBounds: false, animated: false });
             return;
         }
         var sel = MapSelection.fromFeature(found);
@@ -529,6 +511,12 @@ var MapboxApp = class MapboxApp {
         inputElem.value = this.selection.canonicalUrl.toString();
         containerElem.append(contentElem);
         document.body.append(containerElem);
+
+        var doneButton = contentElem.querySelector('.dialog-done button');
+        doneButton.addEventListener('click', function () {
+            containerElem.remove();
+        });
+
         window.setTimeout(function() {
             inputElem.focus();
             inputElem.select();
