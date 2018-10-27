@@ -385,9 +385,9 @@ var MapboxApp = class MapboxApp {
             }.bind(this));
         }.bind(this));
 
-        document.body.addEventListener("keyup", function (e) {
+        document.body.addEventListener('keyup', function (e) {
             if (e.keyCode == 27) { // ESC
-                document.querySelectorAll(".dialog-container.template-cloned").forEach(function (elem) {
+                document.querySelectorAll('.dialog-container.template-cloned').forEach(function (elem) {
                     elem.remove();
                 });
             }
@@ -565,8 +565,8 @@ var MapboxApp = class MapboxApp {
         if (!sel.canonicalUrl) { return; }
         var containerElem = copyTemplateElem('dialog-container');
         var contentElem = copyTemplateElem('permalink-dialog');
-        var inputElem = contentElem.querySelector('input');
-        inputElem.value = sel.canonicalUrl.toString();
+        var urlElem = contentElem.querySelector('.permalink-url');
+        urlElem.innerText = sel.canonicalUrl.toString();
         containerElem.append(contentElem);
         document.body.append(containerElem);
 
@@ -575,10 +575,18 @@ var MapboxApp = class MapboxApp {
             containerElem.remove();
         });
 
-        window.setTimeout(function() {
-            inputElem.focus();
-            inputElem.setSelectionRange(0, inputElem.value.length, 'backward');
-        }, 250);
+        var selectUrl = function(e) {
+            urlElem.contentEditable = true;
+            var range = document.createRange();
+            range.selectNodeContents(urlElem);
+            var textSelection = window.getSelection();
+            textSelection.removeAllRanges();
+            textSelection.addRange(range);
+            if (e) { e.preventDefault(); }
+        };
+
+        window.setTimeout(selectUrl, 250);
+        urlElem.addEventListener('click', selectUrl);
     }
 };
 
