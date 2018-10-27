@@ -186,11 +186,11 @@ var MapSelection = class MapSelection {
     get canonicalUrl() {
         var url = new URL(canonicalUrlBase);
         if (!!this.lat && !!this.lon) {
-            url.searchParams.set('lat', this.lat);
-            url.searchParams.set('lon', this.lon);
+            url.searchParams.set('lat', this.lat.toFixed(4));
+            url.searchParams.set('lon', this.lon.toFixed(4));
         }
         if (!!this.zoom) {
-            url.searchParams.set('zoom', this.zoom);
+            url.searchParams.set('zoom', this.zoom.toFixed(1));
         }
         if (!!this.itemID) {
             url.searchParams.set('itemID', this.itemID);
@@ -577,7 +577,7 @@ var MapboxApp = class MapboxApp {
 
         window.setTimeout(function() {
             inputElem.focus();
-            inputElem.select();
+            inputElem.setSelectionRange(0, inputElem.value.length, 'backward');
         }, 250);
     }
 };
