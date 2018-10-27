@@ -139,7 +139,8 @@ var MapSelection = class MapSelection {
             // TODO zoom
             itemID: itemID,
             // TODO name may be empty
-            title: feature.properties["trailsroc-name"]
+            title: feature.properties["trailsroc-name"],
+            feature: feature
         };
         return new MapSelection(values);
     }
@@ -159,6 +160,11 @@ var MapSelection = class MapSelection {
         this.zoom = values.zoom;
         this.itemID = values.itemID;
         this.title = values.title;
+        if (values.feature) {
+            this.feature = values.feature;
+        } else {
+            this.feature = null;
+        }
     }
 
     get coords() {
@@ -249,7 +255,9 @@ var EntityFinder = class EntityFinder {
 
         var found = this.map.queryRenderedFeatures({
             filter: ["==", "trailsroc-id", trailsrocID]
-        });
+        }).filter(function (f) {
+            return f.layer && this.trailsrocLayerIDs.indexOf(f.layer.id) >= 0;
+        }.bind(this));
         found = found.length == 1 ? found[0] : null;
         if (found != null) {
             this.cachedLookups[trailsrocID] = found;
@@ -351,6 +359,7 @@ var MapboxApp = class MapboxApp {
             this.initialSelection = initialSelection;
         }
 
+        this.highlights = { markers: [], layerIDs: [] };
         this.mapRenderedDebouncer = null;
         this.initialLoadComplete = false;
         this.replaceHistoryState(loc);
@@ -440,10 +449,7 @@ var MapboxApp = class MapboxApp {
     showSelection(sel, opt) {
         var options = Object.assign({ updateBounds: false, animated: false }, opt);
 
-        if (this.marker) {
-            this.marker.remove();
-            this.marker = null;
-        }
+        this.clearMarkers();
         if (!sel) {
             sel = MapSelection.forVisibleMap(this.map);
         }
@@ -459,16 +465,11 @@ var MapboxApp = class MapboxApp {
         this.replaceHistoryState(sel);
 
         if (sel.itemID) {
-            this.marker = new mapboxgl.Marker()
-                .setLngLat([sel.coords.lon, sel.coords.lat])
-                .addTo(this.map);
+            if (!sel.feature) {
+                sel.feature = this.finder.featureWithID(sel.itemID);
+            }
+            this.addMarker(sel.coords.lat, sel.coords.lon, sel.feature);
         }
-
-        // if (sel.title && sel.title.length > 0) {
-        //     var popup = new mapboxgl.Popup()
-        //         .setText(sel.title);
-        //     this.marker.setPopup(popup);
-        // }
 
         var cam = sel.camera;
         if (options.updateBounds && cam) {
@@ -477,6 +478,48 @@ var MapboxApp = class MapboxApp {
             } else {
                 this.map.jumpTo(cam);
             }
+        }
+    }
+
+    clearMarkers() {
+        this.highlights.markers.forEach(function (marker) {
+            marker.remove();
+        });
+        this.highlights.markers = [];
+        this.highlights.layerIDs.forEach(function (id) {
+            this.map.removeLayer(id);
+        }.bind(this));
+        this.highlights.layerIDs = [];
+    }
+
+    addMarker(lat, lon, feature) {
+        if (feature && feature.geometry.type == "LineString") {
+            var layer = {
+                id: `app-highlight-line-${parseInt(Math.random() * 10000)}`,
+                type: "line",
+                source: {
+                    type: "geojson",
+                    data: feature
+                },
+                layout: {
+                    "line-join": "round",
+                    "line-cap": "round",
+                },
+                paint: {
+                    "line-color": "rgba(255, 108, 0, 0.35)",
+                    "line-width": 11
+                }
+            };
+            this.map.addLayer(layer);
+            this.highlights.layerIDs.push(layer.id);
+        } else {
+            var opts = {
+                element: copyTemplateElem('map-marker')
+            };
+            var marker = new mapboxgl.Marker(opts)
+                .setLngLat([lon, lat])
+                .addTo(this.map);
+            this.highlights.markers.push(marker);
         }
     }
 
