@@ -1,0 +1,9 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "org.trailsroc.trailsrocapp",
+    "sha256_cert_fingerprints":
+    ["4E:3C:5B:FA:DD:23:1B:00:3B:77:15:31:18:8D:17:E6:22:BD:80:1F:27:44:38:5D:05:F0:DF:0D:19:CD:0D:C4"]
+  }
+}]
